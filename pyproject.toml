@@ -15,7 +15,7 @@ requires-python = ">=3.9"
 dependencies = [
     "ovito >= 3.9.3",
     "matplotlib >= 3.7",
-    "numpy >= "1.25"
+    "numpy >= 1.25"
 ]
 
 [project.urls]
