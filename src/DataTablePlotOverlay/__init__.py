@@ -9,7 +9,7 @@ from ovito.traits import *
 import matplotlib 
 import numpy as np 
 
-class DataTablePlot(ViewportOverlayInterface):
+class DataTablePlotOverlay(ViewportOverlayInterface):
     
     identifier = Str("", label="Data Table identifier", ovito_placeholder="e.g. coordination-rdf")
     plot_mode = Enum("Auto-detect", "Line", "Histogram", "BarChart", "Scatter", label="plot mode")  
@@ -26,7 +26,7 @@ class DataTablePlot(ViewportOverlayInterface):
     title = Str(label="title", ovito_placeholder="‹auto-detect›", ovito_group=group2)
     x_label = Str(label="x-axis label", ovito_placeholder="‹auto-detect›", ovito_group=group2)
     y_label = Str(label="y-axis label", ovito_placeholder="‹auto-detect›", ovito_group=group2)
-    use_color = Bool(label="Use uniform color", value=False, ovito_group=group2)
+    use_color = Bool(label="Use uniform color", value = False, ovito_group=group2)
     color = ColorTrait(default=(0.401, 0.435, 1.0), ovito_group=group2)  
     font_size = Range(low=0.01, label="font scale", ovito_group=group2)
     y_minor_ticks = Bool(label="show minor y-ticks", ovito_group=group2)
@@ -44,7 +44,7 @@ class DataTablePlot(ViewportOverlayInterface):
             raise RuntimeError(f'Data Table "{self.identifier}" not found. ' + log)
         print(log) 
                        
-        with canvas.mpl_figure(pos=(self.px,self.py), size=(self.w, self.h), font_scale=self.font_size, anchor=self.anchor, alpha=self.alpha, tight_layout=True) as fig:
+        with canvas.mpl_figure(pos=(self.px,self.py), size=(self.w, self.h), font_scale = self.font_size, anchor=self.anchor, alpha=self.alpha, tight_layout=True) as fig:
             
             if self.use_color == True:
                 #Overwrite matplotlib's default color cycle 
@@ -112,7 +112,7 @@ class DataTablePlot(ViewportOverlayInterface):
                 
             # Show legend if data table has more than one y-component
             if plot.y.component_count >= 2 and plot.y.component_names is not None:   
-                    ax.legend(plot.y.component_names, loc="best", handlelength=0.7)
+                    ax.legend(plot.y.component_names, loc ="best", handlelength=0.7)
   
             # Show minor tics on axes    
             if self.y_minor_ticks == True:

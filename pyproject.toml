@@ -3,24 +3,26 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "[[PackageName]]"
-version = "[[Version number]]"
-description = "[[Short description]]"
+name = "DataTablePlot"
+version = "2023.1"
+description = "This Python Viewport Overlay modifier draws selected data tables plots from your pipeline onto the rendered image."
 keywords = ["ovito", "ovito-extension"]
-authors = [{name = "[[Author 1 name]]", email = "[[Author 1 email]]"}, {name = "[[Author 2 name]]", email = "[[Author 2 email]]"}]
-maintainers = [{name = "[[Maintainer 1 name]]", email = "[[Maintainer 1 email]]"}]
-license = {text = "[[License]]"}
+authors = [{name = "Constanze Kalcher", email = "support@ovito.org"}]
+maintainers = [{name = "Constanze Kalcher", email = "support@ovito.org"}]
+license = {text = "MIT License"}
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 dependencies = [
-    "ovito >= 3.9.2",
+    "ovito >= 3.9.3",
+    "matplotlib >= 3.7",
+    "numpy >= "1.25"
 ]
 
 [project.urls]
-repository = "[[Repository Link]]"
+repository = "https://github.com/ckalcher/DataTablePlotOverlay"
 
 [project.entry-points.'OVITO.ViewportOverlay']
-"Human Readable Viewport Overlay Name" = "[[PackageName]]:[[ViewportOverlayName]]"
+"Data Table Plot Viewport Overlay" = "DataTablePlotOverlay:DataTablePlotOverlay"
 
 [tool.setuptools.packages.find]
 where = ["src"]
