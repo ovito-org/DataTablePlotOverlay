@@ -8,7 +8,7 @@ TBD
 TBD
 
 ## Example
-(./examples/DataTablePlotExample.png)
+![](examples/DataTablePlotExample.png)
 
 ## Installation
 - OVITO Pro [integrated Python interpreter](https://docs.ovito.org/python/introduction/installation.html#ovito-pro-integrated-interpreter):
