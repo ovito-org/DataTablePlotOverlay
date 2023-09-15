@@ -13,7 +13,7 @@ license = {text = "MIT License"}
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "ovito >= 3.9.3",
+    "ovito >= 3.9.2",
     "matplotlib >= 3.7",
     "numpy >= 1.25"
 ]
@@ -22,7 +22,7 @@ dependencies = [
 repository = "https://github.com/ckalcher/DataTablePlotOverlay"
 
 [project.entry-points.'OVITO.ViewportOverlay']
-"Data Table Plot Viewport Overlay" = "DataTablePlotOverlay:DataTablePlotOverlay"
+"Data Table Plot" = "DataTablePlotOverlay:DataTablePlotOverlay"
 
 [tool.setuptools.packages.find]
 where = ["src"]

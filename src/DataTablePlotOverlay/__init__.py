@@ -15,12 +15,12 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
     plot_mode = Enum("Auto-detect", "Line", "Histogram", "BarChart", "Scatter", label="plot mode")  
     
     group1 = "Appearance in rendered image" 
-    px = Range(low=0., high=1., value=0.5, label="x-Position", ovito_unit="percent", ovito_group=group1)
-    py = Range(low=0., high=1., value=0.98, label="y-Position", ovito_unit="percent", ovito_group=group1)      
+    px = Range(low=0., high=1., value=0.05, label="x-Position", ovito_unit="percent", ovito_group=group1)
+    py = Range(low=0., high=1., value=0.95, label="y-Position", ovito_unit="percent", ovito_group=group1)      
     w = Range(low=0.05, high=1, value=0.25, label="width", ovito_unit="percent", ovito_group=group1) 
     h = Range(low=0.05, high=1, value=0.25, label="height", ovito_unit="percent", ovito_group=group1)
     alpha = Range(low=0., high=1., value = 0.5, label="alpha", ovito_group=group1)
-    anchor = Enum("center", "north west", "west", "south west", "south", "south east", "east", "north east", "north", label="anchor", ovito_group=group1)  
+    anchor = Enum("north west", "center", "west", "south west", "south", "south east", "east", "north east", "north", label="anchor", ovito_group=group1)  
     
     group2 = "Figure style settings"
     title = Str(label="title", ovito_placeholder="‹auto-detect›", ovito_group=group2)
@@ -28,7 +28,7 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
     y_label = Str(label="y-axis label", ovito_placeholder="‹auto-detect›", ovito_group=group2)
     use_color = Bool(label="Use uniform color", value = False, ovito_group=group2)
     color = ColorTrait(default=(0.401, 0.435, 1.0), ovito_group=group2)  
-    font_size = Range(low=0.01, label="font scale", ovito_group=group2)
+    font_size = Range(value = 1., low=0.01, label="font scale", ovito_group=group2)
     y_minor_ticks = Bool(label="show minor y-ticks", ovito_group=group2)
     x_minor_ticks = Bool(label="show minor x-ticks", ovito_group=group2)      
                                                                                                                                                           
@@ -82,9 +82,13 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
             elif mode == "BarChart":
                 if plot.x is not None:
                     if plot.x.types:
-                        labels = [type.name for type in plot.x.types]
+                        labels = [[type.name, type.id] for type in plot.x.types]
+                        sorted_labels = sorted(labels, key=lambda x: x[1])
+                        labels = [label[0] for label in sorted_labels]
                     for i in range(1, plot_data.shape[1]):
                         ax.bar(labels, plot_data[:,i][:len(labels)], color=[type.color for type in plot.x.types], width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                        if any([len(label) > 10 for label in labels]):
+                            ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=45, ha='right')
                 else:
                     for i in range(1, plot_data.shape[1]):
                         ax.bar(plot_data[:,0], plot_data[:,i], width=(plot_data[:,0][0]-plot_data[:,0][1]))  
