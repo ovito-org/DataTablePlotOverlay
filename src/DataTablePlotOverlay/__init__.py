@@ -1,6 +1,4 @@
-### Data Table Viewport Overlay 
-# This Python Viewport Overlay modifier draws selected data tables plots
-# from your pipeline onto the rendered image.
+# This Python Viewport Overlay modifier places chosen data table plots from your pipeline onto the rendered image.
 
 from ovito.vis import *
 from ovito.data import *
@@ -15,29 +13,29 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
     plot_mode = Enum("Auto-detect", "Line", "Histogram", "BarChart", "Scatter", label="plot mode")  
     
     group1 = "Appearance in rendered image" 
-    px = Range(low=0., high=1., value=0.05, label="x-Position", ovito_unit="percent", ovito_group=group1)
-    py = Range(low=0., high=1., value=0.95, label="y-Position", ovito_unit="percent", ovito_group=group1)      
-    w = Range(low=0.05, high=1, value=0.25, label="width", ovito_unit="percent", ovito_group=group1) 
-    h = Range(low=0.05, high=1, value=0.25, label="height", ovito_unit="percent", ovito_group=group1)
-    alpha = Range(low=0., high=1., value = 0.5, label="alpha", ovito_group=group1)
-    anchor = Enum("north west", "center", "west", "south west", "south", "south east", "east", "north east", "north", label="anchor", ovito_group=group1)  
+    px = Range(low=0., high=1., value=0.05, label="X-Position", ovito_unit="percent", ovito_group=group1)
+    py = Range(low=0., high=1., value=0.95, label="Y-Position", ovito_unit="percent", ovito_group=group1)      
+    w = Range(low=0.05, high=1, value=0.25, label="Width", ovito_unit="percent", ovito_group=group1) 
+    h = Range(low=0.05, high=1, value=0.25, label="Height", ovito_unit="percent", ovito_group=group1)
+    alpha = Range(low=0., high=1., value = 0.5, label="Opacity", ovito_unit="percent", ovito_group=group1)
+    anchor = Enum("north west", "center", "west", "south west", "south", "south east", "east", "north east", "north", label="Anchor", ovito_group=group1)  
     
     group2 = "Figure style settings"
-    title = Str(label="title", ovito_placeholder="‹auto-detect›", ovito_group=group2)
-    x_label = Str(label="x-axis label", ovito_placeholder="‹auto-detect›", ovito_group=group2)
-    y_label = Str(label="y-axis label", ovito_placeholder="‹auto-detect›", ovito_group=group2)
+    title = Str(label="Title", ovito_placeholder="‹auto›", ovito_group=group2)
+    x_label = Str(label="X-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
+    y_label = Str(label="Y-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
     use_color = Bool(label="Use uniform color", value = False, ovito_group=group2)
     color = ColorTrait(default=(0.401, 0.435, 1.0), ovito_group=group2)  
-    font_size = Range(value = 1., low=0.01, label="font scale", ovito_group=group2)
-    y_minor_ticks = Bool(label="show minor y-ticks", ovito_group=group2)
-    x_minor_ticks = Bool(label="show minor x-ticks", ovito_group=group2)      
+    font_size = Range(value = 1., low=0.01, label="Text scaling", ovito_unit="percent", ovito_group=group2)
+    y_minor_ticks = Bool(label="Minor y-ticks", ovito_group=group2)
+    x_minor_ticks = Bool(label="Minor x-ticks", ovito_group=group2)      
                                                                                                                                                           
     def render(self, canvas: ViewportOverlayInterface.Canvas, data: DataCollection, **kwargs):
         if data.tables == {}:
            raise RuntimeError('No data tables found in selected pipeline.')
         
         # List available Data Table identifiers                
-        log = "Available data table plots are named: \n"
+        log = "Available data tables: \n"
         for table in list(data.tables.keys()):
             log += "  *  " + table + "\n"
         if self.identifier not in data.tables:
@@ -82,13 +80,17 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
             elif mode == "BarChart":
                 if plot.x is not None:
                     if plot.x.types:
-                        labels = [[type.name, type.id] for type in plot.x.types]
+                        labels = [[type.name, type.id, type.color] for type in plot.x.types]
                         sorted_labels = sorted(labels, key=lambda x: x[1])
                         labels = [label[0] for label in sorted_labels]
+                        colors = [label[2] for label in sorted_labels]
                     for i in range(1, plot_data.shape[1]):
-                        ax.bar(labels, plot_data[:,i][:len(labels)], color=[type.color for type in plot.x.types], width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
-                        if any([len(label) > 10 for label in labels]):
-                            ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=45, ha='right')
+                        if self.use_color == False:
+                            ax.bar(labels, plot_data[:,i][:len(labels)], color=colors, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                        else:
+                            ax.bar(labels, plot_data[:,i][:len(labels)], color=self.color, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                    if any([len(label) > 10 for label in labels]):
+                        ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=45, ha='right')
                 else:
                     for i in range(1, plot_data.shape[1]):
                         ax.bar(plot_data[:,0], plot_data[:,i], width=(plot_data[:,0][0]-plot_data[:,0][1]))  
