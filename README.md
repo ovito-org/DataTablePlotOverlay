@@ -9,7 +9,7 @@ TBD
 
 ## Example
 ![](examples/DataTablePlotExample2.png)
-![](examples/DataTablePlotExample.mp4)
+![](examples/DataTablePlotExample.gif)
 
 ## Installation
 - OVITO Pro [integrated Python interpreter](https://docs.ovito.org/python/introduction/installation.html#ovito-pro-integrated-interpreter):
