@@ -27,6 +27,9 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
     use_color = Bool(label="Use uniform color", value = False, ovito_group=group2)
     color = ColorTrait(default=(0.401, 0.435, 1.0), ovito_group=group2)  
     font_size = Range(value = 1., low=0.01, label="Text scaling", ovito_unit="percent", ovito_group=group2)
+     
+    fix_y_range = Bool(value = False, label="Fix y-range", ovito_group=group2)
+    y_range = Tuple((0.0, 1.0), label="Y-range", ovito_group=group2)
     y_minor_ticks = Bool(label="Minor y-ticks", ovito_group=group2)
     x_minor_ticks = Bool(label="Minor x-ticks", ovito_group=group2)      
                                                                                                                                                           
@@ -39,7 +42,8 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
         for table in list(data.tables.keys()):
             log += "  *  " + table + "\n"
         if self.identifier not in data.tables:
-            raise RuntimeError(f'Data Table "{self.identifier}" not found. ' + log)
+            print (f'Data Table "{self.identifier}" not found. ' + log)
+            return
         print(log) 
                        
         with canvas.mpl_figure(pos=(self.px,self.py), size=(self.w, self.h), font_scale = self.font_size, anchor=self.anchor, alpha=self.alpha, tight_layout=True) as fig:
@@ -47,7 +51,9 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
             if self.use_color == True:
                 #Overwrite matplotlib's default color cycle 
                 matplotlib.pyplot.rcParams['axes.prop_cycle'] = matplotlib.pyplot.cycler(color=[self.color])
-           
+            else:
+                matplotlib.pyplot.rcParams['axes.prop_cycle'] = matplotlib.pyplot.cycler('color', ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'])
+
             plot_data = data.tables[self.identifier].xy()
             plot = data.tables[self.identifier]
             
@@ -107,7 +113,7 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
                     ax.set_xlabel(plot.x.identifier)
                 else:
                     ax.set_xlabel(plot.axis_label_x)
-            if self.x_label != "":
+            if self.y_label != "":
                 ax.set_ylabel(self.y_label)
             else:
                 ax.set_ylabel(plot.y.identifier)
@@ -126,3 +132,5 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
             if self.x_minor_ticks == True:
                 ax.xaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
                
+            if self.fix_y_range:
+                ax.set_ylim(self.y_range)
