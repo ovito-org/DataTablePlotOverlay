@@ -10,7 +10,7 @@ import numpy as np
 class DataTablePlotOverlay(ViewportOverlayInterface):
     
     identifier = Str("", label="Data Table identifier", ovito_placeholder="e.g. coordination-rdf")
-    plot_mode = Enum("Auto-detect", "Line", "Histogram", "BarChart", "Scatter", label="plot mode")  
+    plot_mode = Enum("Auto-detect", "Line", "Histogram", "BarChart", "Scatter", label="Plot type")  
     
     group1 = "Appearance in rendered image" 
     px = Range(low=0., high=1., value=0.05, label="X-Position", ovito_unit="percent", ovito_group=group1)
@@ -25,7 +25,7 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
     x_label = Str(label="X-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
     y_label = Str(label="Y-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
     use_color = Bool(label="Use uniform color", value = False, ovito_group=group2)
-    color = ColorTrait(default=(0.401, 0.435, 1.0), ovito_group=group2)  
+    color = ColorTrait(default=(0.401, 0.435, 1.0), ovito_group=group2, label = "Unicolor")  
     font_size = Range(value = 1., low=0.01, label="Text scaling", ovito_unit="percent", ovito_group=group2)
      
     fix_y_range = Bool(value = False, label="Fix y-range", ovito_group=group2)
@@ -34,6 +34,10 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
     x_minor_ticks = Bool(label="Minor x-ticks", ovito_group=group2)      
                                                                                                                                                           
     def render(self, canvas: ViewportOverlayInterface.Canvas, data: DataCollection, **kwargs):
+        
+        if data == None:
+            return 
+        
         if data.tables == {}:
            raise RuntimeError('No data tables found in selected pipeline.')
         
