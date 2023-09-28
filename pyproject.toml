@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "DataTablePlot"
-version = "2023.2"
+version = "2023.3"
 description = "This Python Viewport Overlay modifier draws selected data tables plots from your pipeline onto the rendered image."
 keywords = ["ovito", "ovito-extension"]
 authors = [{name = "Constanze Kalcher", email = "support@ovito.org"}]
