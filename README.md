@@ -1,5 +1,5 @@
 # Data Table Plot Overlay
-The Data Table Plot Overlay is a Python-based viewport overlay for OVITO that leverages the matplotlib library to plot data tables from your pipeline and overlays the plots onto the rendered images. It provides a convenient way to include plots generated from exisiting data tables in your image or animation rendered with OVITO Pro.
+The Data Table Plot Overlay is a Python-based viewport overlay for OVITO that leverages the matplotlib library to plot data tables from your pipeline and overlays the plots onto the rendered images. It provides a convenient way to include plots generated from existing data tables in your image or animation rendered with OVITO Pro.
 
 ## Description
 This modifier can automatically choose the most suitable plot style for visualizing the data, such as scatter plots, line plots, histograms, or bar charts. However, you can also manually select a specific plot type from the provided drop-down list.
