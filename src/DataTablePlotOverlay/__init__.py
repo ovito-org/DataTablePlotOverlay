@@ -9,18 +9,18 @@ import numpy as np
 
 class DataTablePlotOverlay(ViewportOverlayInterface):
     
-    identifier = Str("", label="Data Table identifier", ovito_placeholder="e.g. coordination-rdf")
-    plot_mode = Enum("Auto-detect", "Line", "Histogram", "BarChart", "Scatter", label="Plot type")  
+    identifier = Str("", label="Data table identifier", ovito_placeholder="e.g. coordination-rdf")
+    plot_mode = Map({"Auto-detect":"Auto-detect", "Line":"Line", "Distribution histogram":"Histogram", "Category bar chart":"BarChart", "Scatter":"Scatter"}, label="Plot type")  
+
+    group1 = "Positioning" 
+    alignment =  Map({"Top left": (0.,1.,"north west"), "Top":(0.5, 1., "north"), "Top right":(1.,1., "north east"), "Right":(1., 0.5, "east"), "Bottom right": (1.,0., "south east"), "Bottom": (0.5,0., "south"), "Bottom left":(0.,0., "south west"), "Left":(0.,0.5, "west")}, label="Alignment", ovito_group=group1)  
+    px = Range(low=0., high=1., value=0.0, label="X-offset", ovito_unit="percent", ovito_group=group1)
+    py = Range(low=0., high=1., value=0.0, label="Y-offset", ovito_unit="percent", ovito_group=group1)      
+    w = Range(low=0.05, high=1, value=0.5, label="Width", ovito_unit="percent", ovito_group=group1) 
+    h = Range(low=0.05, high=1, value=0.5, label="Height", ovito_unit="percent", ovito_group=group1)
+    alpha = Range(low=0., high=1., value = 1., label="Opacity", ovito_unit="percent", ovito_group=group1)
     
-    group1 = "Appearance in rendered image" 
-    px = Range(low=0., high=1., value=0.05, label="X-Position", ovito_unit="percent", ovito_group=group1)
-    py = Range(low=0., high=1., value=0.95, label="Y-Position", ovito_unit="percent", ovito_group=group1)      
-    w = Range(low=0.05, high=1, value=0.25, label="Width", ovito_unit="percent", ovito_group=group1) 
-    h = Range(low=0.05, high=1, value=0.25, label="Height", ovito_unit="percent", ovito_group=group1)
-    alpha = Range(low=0., high=1., value = 0.5, label="Opacity", ovito_unit="percent", ovito_group=group1)
-    anchor = Enum("north west", "center", "west", "south west", "south", "south east", "east", "north east", "north", label="Anchor", ovito_group=group1)  
-    
-    group2 = "Figure style settings"
+    group2 = "Figure style"
     title = Str(label="Title", ovito_placeholder="‹auto›", ovito_group=group2)
     x_label = Str(label="X-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
     y_label = Str(label="Y-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
@@ -29,7 +29,9 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
     font_size = Range(value = 1., low=0.01, label="Text scaling", ovito_unit="percent", ovito_group=group2)
      
     fix_y_range = Bool(value = False, label="Fix y-range", ovito_group=group2)
-    y_range = Tuple((0.0, 1.0), label="Y-range", ovito_group=group2)
+    y_range_max = Float(5.0, label="Y max", ovito_group=group2)
+    y_range_min = Float(0.0, label="Y min", ovito_group=group2) 
+
     y_minor_ticks = Bool(label="Minor y-ticks", ovito_group=group2)
     x_minor_ticks = Bool(label="Minor x-ticks", ovito_group=group2)      
                                                                                                                                                           
@@ -45,12 +47,14 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
         log = "Available data tables: \n"
         for table in list(data.tables.keys()):
             log += "  *  " + table + "\n"
+        print(log)    
         if self.identifier not in data.tables:
-            print (f'Data Table "{self.identifier}" not found. ' + log)
+            if self.identifier == '':
+                return
+            print (f'Data Table "{self.identifier}" not found. ')
             return
-        print(log) 
-                       
-        with canvas.mpl_figure(pos=(self.px,self.py), size=(self.w, self.h), font_scale = self.font_size, anchor=self.anchor, alpha=self.alpha, tight_layout=True) as fig:
+                
+        with canvas.mpl_figure(pos=(self.alignment_[0] + self.px, self.alignment_[1] + self.py), size=(self.w, self.h), font_scale = self.font_size, anchor=self.alignment_[2], alpha=self.alpha, tight_layout=True) as fig:
             
             if self.use_color == True:
                 #Overwrite matplotlib's default color cycle 
@@ -63,14 +67,14 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
             
             # OVITO's internal plot type assigned to the chosen data table
             mode = str(data.tables[self.identifier].plot_mode).split(".")[1]
-            
+
             # Plot type chosen by the user
             ## Auto-detect
-            if self.plot_mode == "Auto-detect":
+            if self.plot_mode_ == "Auto-detect":
                 if mode == "NoPlot":
                     raise RuntimeError("Auto-detection of plot mode not possible. Please choose from drop-down.") 
             else:
-                mode = self.plot_mode
+                mode = self.plot_mode_
     
             if plot_data.shape[0] < 2 and mode != "Scatter":
                     raise RuntimeError(f"Not enough data points for {mode} plot.")
@@ -94,11 +98,12 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
                         sorted_labels = sorted(labels, key=lambda x: x[1])
                         labels = [label[0] for label in sorted_labels]
                         colors = [label[2] for label in sorted_labels]
+                        type_ids = [label[1] for label in sorted_labels]
                     for i in range(1, plot_data.shape[1]):
                         if self.use_color == False:
-                            ax.bar(labels, plot_data[:,i][:len(labels)], color=colors, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                            ax.bar(labels, plot_data[:,i][type_ids], color=colors, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
                         else:
-                            ax.bar(labels, plot_data[:,i][:len(labels)], color=self.color, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                            ax.bar(labels, plot_data[:,i][type_ids], color=self.color, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
                     if any([len(label) > 10 for label in labels]):
                         ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=45, ha='right')
                 else:
@@ -137,4 +142,4 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
                 ax.xaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
                
             if self.fix_y_range:
-                ax.set_ylim(self.y_range)
+                ax.set_ylim(self.y_range_min, self.y_range_max)

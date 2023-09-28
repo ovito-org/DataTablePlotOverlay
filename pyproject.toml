@@ -22,7 +22,7 @@ dependencies = [
 repository = "https://github.com/ckalcher/DataTablePlotOverlay"
 
 [project.entry-points.'OVITO.ViewportOverlay']
-"Data Table Plot" = "DataTablePlotOverlay:DataTablePlotOverlay"
+"Data table plot" = "DataTablePlotOverlay:DataTablePlotOverlay"
 
 [tool.setuptools.packages.find]
 where = ["src"]
