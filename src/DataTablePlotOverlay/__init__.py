@@ -14,8 +14,8 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
 
     group1 = "Positioning" 
     alignment =  Map({"Top left": (0.,1.,"north west"), "Top":(0.5, 1., "north"), "Top right":(1.,1., "north east"), "Right":(1., 0.5, "east"), "Bottom right": (1.,0., "south east"), "Bottom": (0.5,0., "south"), "Bottom left":(0.,0., "south west"), "Left":(0.,0.5, "west")}, label="Alignment", ovito_group=group1)  
-    px = Range(low=0., high=1., value=0.0, label="X-offset", ovito_unit="percent", ovito_group=group1)
-    py = Range(low=0., high=1., value=0.0, label="Y-offset", ovito_unit="percent", ovito_group=group1)      
+    px = Range(low=-1., high=1., value=0.0, label="X-offset", ovito_unit="percent", ovito_group=group1)
+    py = Range(low=-1., high=1., value=0.0, label="Y-offset", ovito_unit="percent", ovito_group=group1)      
     w = Range(low=0.05, high=1, value=0.5, label="Width", ovito_unit="percent", ovito_group=group1) 
     h = Range(low=0.05, high=1, value=0.5, label="Height", ovito_unit="percent", ovito_group=group1)
     alpha = Range(low=0., high=1., value = 1., label="Opacity", ovito_unit="percent", ovito_group=group1)
