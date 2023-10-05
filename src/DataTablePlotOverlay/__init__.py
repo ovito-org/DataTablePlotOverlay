@@ -55,12 +55,6 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
             return
                 
         with canvas.mpl_figure(pos=(self.alignment_[0] + self.px, self.alignment_[1] + self.py), size=(self.w, self.h), font_scale = self.font_size, anchor=self.alignment_[2], alpha=self.alpha, tight_layout=True) as fig:
-            
-            if self.use_color == True:
-                #Overwrite matplotlib's default color cycle 
-                matplotlib.pyplot.rcParams['axes.prop_cycle'] = matplotlib.pyplot.cycler(color=[self.color])
-            else:
-                matplotlib.pyplot.rcParams['axes.prop_cycle'] = matplotlib.pyplot.cycler('color', ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'])
 
             plot_data = data.tables[self.identifier].xy()
             plot = data.tables[self.identifier]
@@ -90,7 +84,7 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
                     ax.plot(plot_data[:,0], plot_data[:,i])
             elif mode == "Histogram":
                 for i in range(1, plot_data.shape[1]):
-                    ax.bar(plot_data[:,0], plot_data[:,i], width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                    ax.bar(plot_data[:,0], plot_data[:,i], width=0.8*(plot_data[:,0][1]-plot_data[:,0][0]))
             elif mode == "BarChart":
                 if plot.x is not None:
                     if plot.x.types:
@@ -101,9 +95,9 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
                         type_ids = [label[1] for label in sorted_labels]
                     for i in range(1, plot_data.shape[1]):
                         if self.use_color == False:
-                            ax.bar(labels, plot_data[:,i][type_ids], color=colors, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                            ax.bar(labels, plot_data[:,i][type_ids], width=0.8*(plot_data[:,0][1]-plot_data[:,0][0]))
                         else:
-                            ax.bar(labels, plot_data[:,i][type_ids], color=self.color, width=0.8*(plot_data[:,0][0]-plot_data[:,0][1]))
+                            ax.bar(labels, plot_data[:,i][type_ids], color=self.color, width=0.8*(plot_data[:,0][1]-plot_data[:,0][0]))
                     if any([len(label) > 10 for label in labels]):
                         ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=45, ha='right')
                 else:
