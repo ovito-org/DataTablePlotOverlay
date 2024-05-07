@@ -10,11 +10,11 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
 
     input_table = DataObjectReference(DataTable, label="Data table")
     plot_mode = Map({
-            "Auto-detect": "Auto-detect", 
-            "Line": "Line", 
-            "Distribution histogram": "Histogram", 
-            "Category bar chart": "BarChart", 
-            "Scatter": "Scatter"
+            "Auto-detect": None, 
+            "Line": DataTable.PlotMode.Line, 
+            "Distribution histogram": DataTable.PlotMode.Histogram, 
+            "Category bar chart": DataTable.PlotMode.BarChart, 
+            "Scatter": DataTable.PlotMode.Scatter
         }, label="Plot type")
 
     group1 = "Positioning"
@@ -51,38 +51,35 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
         plot = self.input_table.get_from(data)
         if not plot:
             raise RuntimeError(f"Data table '{self.input_table}' not found in pipeline output.")
+        if plot.y is None:
+            raise RuntimeError(f"Data table '{self.input_table}' cannot be plotted because it has no data y-axis.")
 
         with canvas.mpl_figure(pos=(self.alignment_[0] + self.offset[0], self.alignment_[1] + self.offset[1]), size=self.size, font_scale = self.font_size, anchor=self.alignment_[2], alpha=self.alpha, tight_layout=True) as fig:
 
-            plot_data = plot.xy()
-
-            # OVITO's internal plot type assigned to the chosen data table
-            mode = str(plot.plot_mode).split(".")[1]
-
-            # Plot type chosen by the user
-            ## Auto-detect
-            if self.plot_mode_ == "Auto-detect":
-                if mode == "NoPlot":
+            # Select plot mode
+            mode = self.plot_mode_
+            if mode == None:
+                mode = plot.plot_mode
+                if mode == DataTable.PlotMode.NoPlot:
                     raise RuntimeError("Auto-detection of plot mode not possible. Please choose from drop-down list.")
-            else:
-                mode = self.plot_mode_
 
-            if plot_data.shape[0] < 2 and mode != "Scatter":
-                    raise RuntimeError(f"Not enough data points for {mode} plot.")
-            if plot_data.shape[0] > 100 and mode in ["Histogram", "BarChart"]:
-                    raise RuntimeError(f"Too many data points for {mode} plot.")
+            # Obtain data to be plotted
+            plot_data = plot.xy()
+            if plot_data.shape[0] < 2 and mode != DataTable.PlotMode.Scatter:
+                    raise RuntimeError(f"Not enough data points for {mode.name} plot.")
+            if plot_data.shape[0] > 100 and mode in [DataTable.PlotMode.Histogram, DataTable.PlotMode.BarChart]:
+                    raise RuntimeError(f"Too many data points for {mode.name} plot.")
 
             ax = fig.subplots()
             ax.patch.set_alpha(self.alpha)
 
-            ## All other plot types
-            if mode == "Line":
+            if mode == DataTable.PlotMode.Line:
                 for i in range(1, plot_data.shape[1]):
                     ax.plot(plot_data[:,0], plot_data[:,i])
-            elif mode == "Histogram":
+            elif mode == DataTable.PlotMode.Histogram:
                 for i in range(1, plot_data.shape[1]):
                     ax.bar(plot_data[:,0], plot_data[:,i], width=0.8*(plot_data[:,0][1]-plot_data[:,0][0]))
-            elif mode == "BarChart":
+            elif mode == DataTable.PlotMode.BarChart:
                 if plot.x is not None:
                     if plot.x.types:
                         labels = [[type.name, type.id, type.color] for type in plot.x.types]
@@ -100,36 +97,30 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
                 else:
                     for i in range(1, plot_data.shape[1]):
                         ax.bar(plot_data[:,0], plot_data[:,i], width=(plot_data[:,0][0]-plot_data[:,0][1]))
-            elif mode == "Scatter":
+            elif mode == DataTable.PlotMode.Scatter:
                 for i in range(1, plot_data.shape[1]):
                     ax.scatter(plot_data[:,0], plot_data[:,i])
 
-            # Change axis labels and title to user input if specified
+            # Change axis labels and title to user input if specified;
             # otherwise use info from data table
-            if self.x_label != "":
+            if self.x_label:
                 ax.set_xlabel(self.x_label)
             else:
                 if plot.x is not None:
                     ax.set_xlabel(plot.x.identifier)
                 else:
                     ax.set_xlabel(plot.axis_label_x)
-            if self.y_label != "":
-                ax.set_ylabel(self.y_label)
-            else:
-                ax.set_ylabel(plot.y.identifier)
-            if self.title != "":
-                ax.set_title(self.title)
-            else:
-                ax.set_title(plot.title)
+            ax.set_ylabel(self.y_label if self.y_label else plot.y.identifier)
+            ax.set_title(self.title if self.title else plot.title)
 
             # Show legend if data table has more than one y-component
             if plot.y.component_count >= 2 and plot.y.component_names is not None:
-                    ax.legend(plot.y.component_names, loc ="best", handlelength=0.7)
+                    ax.legend(plot.y.component_names, loc="best", handlelength=0.7)
 
-            # Show minor tics on axes
-            if self.y_minor_ticks == True:
+            # Show minor ticks on axes
+            if self.y_minor_ticks:
                 ax.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
-            if self.x_minor_ticks == True:
+            if self.x_minor_ticks:
                 ax.xaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
 
             if self.fix_y_range:
