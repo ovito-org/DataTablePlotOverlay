@@ -18,24 +18,33 @@ class DataTablePlotOverlay(ViewportOverlayInterface):
         }, label="Plot type")
 
     group1 = "Positioning"
-    alignment = Map({"Top left": (0.,1.,"north west"), "Top":(0.5, 1., "north"), "Top right":(1.,1., "north east"), "Right":(1., 0.5, "east"), "Bottom right": (1.,0., "south east"), "Bottom": (0.5,0., "south"), "Bottom left":(0.,0., "south west"), "Left":(0.,0.5, "west")}, label="Alignment", ovito_group=group1)
-    offset = Vector2(low=-1., high=1., default=(0.0, 0.0), label="Offset", ovito_unit="percent", ovito_group=group1)
-    size = Vector2(low=0.05, high=1, default=(0.5, 0.5), label="Size", ovito_unit="percent", ovito_group=group1)
+    alignment = Map({
+            "Top left": (0., 1., "north west"), 
+            "Top": (0.5, 1., "north"), 
+            "Top right": (1.,1., "north east"), 
+            "Right": (1., 0.5, "east"), 
+            "Bottom right": (1., 0., "south east"), 
+            "Bottom": (0.5, 0., "south"), 
+            "Bottom left": (0., 0., "south west"), 
+            "Left":(0., 0.5, "west")
+        }, label="Alignment", ovito_group=group1)
+    offset = Vector2(low=-1.0, high=1.0, default=(0.0, 0.0), label="Offset", ovito_unit="percent", ovito_group=group1)
+    size = Vector2(low=0.05, high=1.0, default=(0.5, 0.5), label="Size", ovito_unit="percent", ovito_group=group1)
 
     group2 = "Figure style"
     title = Str(label="Title", ovito_placeholder="‹auto›", ovito_group=group2)
     x_label = Str(label="X-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
     y_label = Str(label="Y-axis label", ovito_placeholder="‹auto›", ovito_group=group2)
-    use_color = Bool(label="Use uniform color", value = False, ovito_group=group2)
-    color = Color(default=(0.401, 0.435, 1.0), ovito_group=group2, label = "Unicolor")
-    alpha = Range(low=0., high=1., value = 1., label="Bg. opacity", ovito_unit="percent", ovito_group=group2)
-    font_size = Range(value = 1., low=0.01, label="Text scaling", ovito_unit="percent", ovito_group=group2)
+    use_color = Bool(label="Use uniform color", value=False, ovito_group=group2)
+    color = Color(default=(0.401, 0.435, 1.0), ovito_group=group2, label="Unicolor")
+    alpha = Range(low=0.0, high=1.0, value=1.0, label="Bg. opacity", ovito_unit="percent", ovito_group=group2)
+    font_size = Range(value=1.0, low=0.01, label="Text scaling", ovito_unit="percent", ovito_group=group2)
 
     x_minor_ticks = Bool(label="X-axis minor ticks", ovito_group=group2)
     y_minor_ticks = Bool(label="Y-axis minor ticks", ovito_group=group2)
 
     group3 = "Plot range"
-    fix_y_range = Bool(value = False, label="Fixed y-range:", ovito_group=group3)
+    fix_y_range = Bool(value=False, label="Fixed y-range:", ovito_group=group3)
     y_range_max = Float(5.0, label="Y-max", ovito_group=group3)
     y_range_min = Float(0.0, label="Y-min", ovito_group=group3)
 
