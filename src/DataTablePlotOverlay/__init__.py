@@ -8,7 +8,7 @@ import matplotlib
 
 class DataTablePlotOverlay(ViewportOverlayInterface):
 
-    input_table = DataObjectReference(DataTable, label="Data table")
+    input_table = DataObjectReference(DataTable, label="Data source")
     plot_mode = Map({
             "Auto-detect": None, 
             "Line": DataTable.PlotMode.Line, 
