@@ -12,7 +12,8 @@ This modifier can automatically choose the most suitable plot style for visualiz
 - Automatically detect the appropriate plot type or manually select one from the drop-down list.
 
 ## Parameters
-- **Data Table Identifier**: Select the data table to be plotted.
+- **Use Results from Pipeline**: Select the pipeline that holds the data table.
+- **Input Table**: Select the data table to be plotted.
 - **Plot Type**: Choose the type of plot (Auto-detect, Line, Distribution histogram, Category bar chart, Scatter).
 - **Alignment**: Select the corner of the viewport where the plot is displayed (anchor position).
 - **X-Position**: Set an offset to the x-position of the overlay relative to the anchor point.
@@ -30,6 +31,8 @@ This modifier can automatically choose the most suitable plot style for visualiz
 - **Y-Range**: Set the y-axis range (if Fix y-range is enabled).
 - **Minor Y-Ticks**: Enable minor ticks on the y-axis.
 - **Minor X-Ticks**: Enable minor ticks on the x-axis.
+- **Show time slider**: For trajectories, display a vertical line in the plot indicating the current animation frame.
+- **Line color**: Choose the color of the time slider in the plot.
 
 ## Example
 ![Example](examples/DataTablePlotOverlayExample.png)
@@ -47,7 +50,7 @@ This modifier can automatically choose the most suitable plot style for visualiz
   ```
 
 ## Technical information / dependencies
-- Tested on OVITO version 3.9.3-dev
+- Tested on OVITO version 3.11-dev
 
 ## Contact
 Constanze Kalcher support@ovito.org
